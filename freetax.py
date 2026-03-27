@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyMUwNnE5AcAqrJMG92/1FTO",
+      "authorship_tag": "ABX9TyNhiVN8DOuLwkLq5QWLfj8T",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -139,8 +139,6 @@
     {
       "cell_type": "code",
       "source": [
-        "\n",
-        "\n",
         "def process_freetax_file(df: pd.DataFrame) -> pd.DataFrame:\n",
         "    \"\"\"\n",
         "    이카운트 엑셀 파일을 홈택스 업로드 양식으로 변환합니다.\n",
@@ -267,8 +265,13 @@
         "        if st.button(\"🚀 변환 실행\", use_container_width=True):\n",
         "            with st.spinner('양식을 생성 중입니다...'):\n",
         "                # 변환 로직 (선택 모드에 따라 처리)\n",
-        "                # process_ecount_file 함수 내부에서 과세/면세 컬럼 매핑을 처리한다고 가정\n",
-        "                processed_df = process_ecount_file(df_original.copy(), mode)\n",
+        "                if mode == \"과세(세금계산서)\":\n",
+        "                    processed_df = process_ecount_file(df_original.copy())\n",
+        "                elif mode == \"면세(계산서)\":\n",
+        "                    processed_df = process_freetax_file(df_original.copy())\n",
+        "                else:\n",
+        "                    st.error(\"유효하지 않은 변환 모드입니다.\")\n",
+        "                    st.stop()\n",
         "\n",
         "                st.subheader(f\"✅ {mode} 변환 결과\")\n",
         "                st.dataframe(processed_df)\n",
@@ -299,8 +302,7 @@
         "                )\n",
         "\n",
         "    except Exception as e:\n",
-        "        st.error(f\"오류 발생: {e}\")\n",
-        "\n"
+        "        st.error(f\"오류 발생: {e}\")"
       ],
       "metadata": {
         "id": "Pho_YqK55DcK"
