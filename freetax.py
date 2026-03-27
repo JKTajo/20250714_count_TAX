@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyNhiVN8DOuLwkLq5QWLfj8T",
+      "authorship_tag": "ABX9TyOunijggn2YOdnWW8XX0xTZ",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -25,6 +25,17 @@
       "source": [
         "<a href=\"https://colab.research.google.com/github/JKTajo/20250714_count_TAX/blob/main/freetax.py\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
       ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# This cell is now empty as its content has been merged into cell Pho_YqK55DcK."
+      ],
+      "metadata": {
+        "id": "tEiEuAdv4tX5"
+      },
+      "execution_count": null,
+      "outputs": []
     },
     {
       "cell_type": "code",
@@ -128,17 +139,8 @@
         "    # NaN 값을 빈 문자열로 변환\n",
         "    df_final = df_final.fillna('')\n",
         "\n",
-        "    return df_final\n"
-      ],
-      "metadata": {
-        "id": "tEiEuAdv4tX5"
-      },
-      "execution_count": null,
-      "outputs": []
-    },
-    {
-      "cell_type": "code",
-      "source": [
+        "    return df_final\n",
+        "\n",
         "def process_freetax_file(df: pd.DataFrame) -> pd.DataFrame:\n",
         "    \"\"\"\n",
         "    이카운트 엑셀 파일을 홈택스 업로드 양식으로 변환합니다.\n",
