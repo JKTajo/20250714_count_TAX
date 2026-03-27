@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyNVxkgLQxYz5y4fBmaW53a0",
+      "authorship_tag": "ABX9TyMUwNnE5AcAqrJMG92/1FTO",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -28,45 +28,120 @@
     },
     {
       "cell_type": "code",
-      "execution_count": null,
-      "metadata": {
-        "colab": {
-          "base_uri": "https://localhost:8080/",
-          "height": 387
-        },
-        "id": "3udw_Vj3vsKC",
-        "outputId": "dba79031-36f9-421d-bbdf-be16340bcad0"
-      },
-      "outputs": [
-        {
-          "output_type": "error",
-          "ename": "ModuleNotFoundError",
-          "evalue": "No module named 'streamlit'",
-          "traceback": [
-            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
-            "\u001b[0;31mModuleNotFoundError\u001b[0m                       Traceback (most recent call last)",
-            "\u001b[0;32m/tmp/ipykernel_3553/243199688.py\u001b[0m in \u001b[0;36m<cell line: 0>\u001b[0;34m()\u001b[0m\n\u001b[0;32m----> 1\u001b[0;31m \u001b[0;32mimport\u001b[0m \u001b[0mstreamlit\u001b[0m \u001b[0;32mas\u001b[0m \u001b[0mst\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      2\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mpandas\u001b[0m \u001b[0;32mas\u001b[0m \u001b[0mpd\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      3\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mio\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      4\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      5\u001b[0m \u001b[0;32mdef\u001b[0m \u001b[0mecount_freetax_file\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mdf\u001b[0m\u001b[0;34m:\u001b[0m \u001b[0mpd\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mDataFrame\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;34m->\u001b[0m \u001b[0mpd\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mDataFrame\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
-            "\u001b[0;31mModuleNotFoundError\u001b[0m: No module named 'streamlit'",
-            "",
-            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0;32m\nNOTE: If your import is failing due to a missing package, you can\nmanually install dependencies using either !pip or !apt.\n\nTo view examples of installing some common dependencies, click the\n\"Open Examples\" button below.\n\u001b[0;31m---------------------------------------------------------------------------\u001b[0m\n"
-          ],
-          "errorDetails": {
-            "actions": [
-              {
-                "action": "open_url",
-                "actionText": "Open Examples",
-                "url": "/notebooks/snippets/importing_libraries.ipynb"
-              }
-            ]
-          }
-        }
-      ],
       "source": [
         "import streamlit as st\n",
         "import pandas as pd\n",
         "import io\n",
         "\n",
         "def process_ecount_file(df: pd.DataFrame) -> pd.DataFrame:\n",
+        "    \"\"\"\n",
+        "    이카운트 엑셀 파일을 홈택스 업로드 양식으로 변환합니다.\n",
+        "\n",
+        "    Args:\n",
+        "        df (pd.DataFrame): 원본 이카운트 데이터프레임.\n",
+        "\n",
+        "    Returns:\n",
+        "        pd.DataFrame: 변환된 홈택스 양식의 데이터프레임.\n",
+        "    \"\"\"\n",
+        "    # 1. 데이터 전처리\n",
+        "    df['code'] = '01'  # 유형: 01 (일반세금계산서)\n",
+        "    df['Date'] = df['Date'].astype(str).str[:8]\n",
+        "    df['day'] = df['Date'].str[-2:]\n",
+        "    df['TaxNo_Send'] = df['TaxNo_Send'].astype(str)\n",
+        "    df['TaxNo_get'] = df['TaxNo_get'].astype(str)\n",
+        "\n",
+        "    # 2. 공급가액이 0보다 큰 데이터만 선택 및 품목별 분리\n",
+        "    df = df[df['price'] > 0]\n",
+        "\n",
+        "    # '하나은행' 데이터 별도 처리\n",
+        "    df_Hana = df[df['TaxNo_get'] == '2298500670']\n",
+        "    df = df[df['TaxNo_get'] != '2298500670']\n",
+        "\n",
+        "    # 품목별 DataFrame 생성\n",
+        "    df1 = df[df['item'] == '임대료']\n",
+        "    df2 = df[df['item'] == '관리비']\n",
+        "    df3 = df[df['item'] == '전기료']\n",
+        "    df4 = df[df['item'] == '주차료']\n",
+        "\n",
+        "    # 분리했던 '하나은행' 데이터를 '임대료'에 다시 포함\n",
+        "    if not df_Hana.empty:\n",
+        "        df1 = pd.concat([df_Hana, df1])\n",
+        "\n",
+        "    # 3. 데이터 병합\n",
+        "    # 기준이 되는 키 컬럼 정의\n",
+        "    key_id = ['code', 'Date', 'TaxNo_Send', 'J1', 'Title_send', 'Name_send',\n",
+        "              'Addr_send', 'sub1', 'sub2', 'Email_send',\n",
+        "              'TaxNo_get', 'J2', 'TaxTitle_get', 'Name_get',\n",
+        "              'Addr_get', 'type1', 'type2', 'Email_get', 'Email2_get', 'note_Sum']\n",
+        "\n",
+        "    # 품목별 데이터를 key_id 기준으로 병합\n",
+        "    merged_df = pd.merge(df1, df2, how='outer', on=key_id, suffixes=('_1', '_2'))\n",
+        "    merged_df = pd.merge(merged_df, df3, how='outer', on=key_id)\n",
+        "    merged_df = pd.merge(merged_df, df4, how='outer', on=key_id, suffixes=('_3', '_4'))\n",
+        "\n",
+        "    # 4. 합계 계산 및 추가\n",
+        "    price_cols = ['price_1', 'price_2', 'price_3', 'price_4']\n",
+        "    vat_cols = ['VAT_1', 'VAT_2', 'VAT_3', 'VAT_4']\n",
+        "\n",
+        "    # DataFrame에 해당 열이 없을 경우 0으로 생성\n",
+        "    for col in price_cols + vat_cols:\n",
+        "        if col not in merged_df.columns:\n",
+        "            merged_df[col] = 0\n",
+        "\n",
+        "    # NaN 값을 0으로 채우고 합계 계산\n",
+        "    merged_df.loc[:, 'price_sum'] = merged_df[price_cols].fillna(0).sum(axis=1).astype(int)\n",
+        "    merged_df.loc[:, 'VAT_sum'] = merged_df[vat_cols].fillna(0).sum(axis=1).astype(int)\n",
+        "\n",
+        "    # 5. 홈택스 양식에 맞게 열 순서 재정렬 및 추가\n",
+        "    # 최종적으로 필요한 열 목록\n",
+        "    final_columns = [\n",
+        "        'code', 'Date', 'TaxNo_Send', 'J1', 'Title_send', 'Name_send', 'Addr_send',\n",
+        "        'sub1', 'sub2', 'Email_send', 'TaxNo_get', 'J2', 'TaxTitle_get', 'Name_get',\n",
+        "        'Addr_get', 'type1', 'type2', 'Email_get', 'Email2_get', 'price_sum',\n",
+        "        'VAT_sum', 'note_Sum', 'day_1', 'item_1', 'standard_1', 'quantity_1',\n",
+        "        'unit_price_1', 'price_1', 'VAT_1', 'note_1', 'day_2', 'item_2',\n",
+        "        'standard_2', 'quantity_2', 'unit_price_2', 'price_2', 'VAT_2', 'note_2',\n",
+        "        'day_3', 'item_3', 'standard_3', 'quantity_3', 'unit_price_3', 'price_3',\n",
+        "        'VAT_3', 'note_3', 'day_4', 'item_4', 'standard_4', 'quantity_4',\n",
+        "        'unit_price_4', 'price_4', 'VAT_4', 'note_4'\n",
+        "    ]\n",
+        "\n",
+        "    # 없는 열은 빈 값으로 추가\n",
+        "    for col in final_columns:\n",
+        "        if col not in merged_df.columns:\n",
+        "            merged_df[col] = ''\n",
+        "\n",
+        "    df_final = merged_df[final_columns]\n",
+        "\n",
+        "    # 6. 추가 데이터 정리\n",
+        "    for i in range(1, 5):\n",
+        "        df_final.loc[:, f'note_{i}'] = ''\n",
+        "\n",
+        "    df_final.loc[:, \"etc1\"] = \"\"\n",
+        "    df_final.loc[:, \"etc2\"] = \"\"\n",
+        "    df_final.loc[:, \"etc3\"] = \"\"\n",
+        "    df_final.loc[:, \"etc4\"] = \"\"\n",
+        "    df_final.loc[:, \"etc5\"] = \"02\"  # 청구(02)\n",
+        "\n",
+        "    df_final.loc[:, 'TaxNo_get'] = df_final['TaxNo_get'].str.replace('_B', '', regex=False)\n",
+        "\n",
+        "    # NaN 값을 빈 문자열로 변환\n",
+        "    df_final = df_final.fillna('')\n",
+        "\n",
+        "    return df_final\n"
+      ],
+      "metadata": {
+        "id": "tEiEuAdv4tX5"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "\n",
+        "\n",
+        "def process_freetax_file(df: pd.DataFrame) -> pd.DataFrame:\n",
         "    \"\"\"\n",
         "    이카운트 엑셀 파일을 홈택스 업로드 양식으로 변환합니다.\n",
         "\n",
@@ -226,7 +301,12 @@
         "    except Exception as e:\n",
         "        st.error(f\"오류 발생: {e}\")\n",
         "\n"
-      ]
+      ],
+      "metadata": {
+        "id": "Pho_YqK55DcK"
+      },
+      "execution_count": null,
+      "outputs": []
     }
   ]
 }
