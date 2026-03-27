@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyOnqFjASjNYHNoNkNvcu7S3",
+      "authorship_tag": "ABX9TyNnPa2+UiVJraVCMoM7Pxyu",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -28,7 +28,7 @@
     },
     {
       "cell_type": "code",
-      "execution_count": 1,
+      "execution_count": null,
       "metadata": {
         "colab": {
           "base_uri": "https://localhost:8080/",
@@ -66,7 +66,7 @@
         "import pandas as pd\n",
         "import io\n",
         "\n",
-        "def ecount_freetax_file(df: pd.DataFrame) -> pd.DataFrame:\n",
+        "def process_ecount_file(df: pd.DataFrame) -> pd.DataFrame:\n",
         "    \"\"\"\n",
         "    이카운트 엑셀 파일을 홈택스 업로드 양식으로 변환합니다.\n",
         "\n",
@@ -105,9 +105,9 @@
         "              'Addr_get', 'type1', 'type2', 'Email_get', 'Email2_get', 'note_Sum']\n",
         "\n",
         "    # 품목별 데이터를 key_id 기준으로 병합\n",
-        "    merged_df = pd.merge(df1, df2, how='outer', on=key_id, suffixes=('_1', '_2'))\n",
-        "    merged_df = pd.merge(mergeddf, df3, how='outer', on=key_id)\n",
-        "    merged_df = pd.merge(merged_df, df4, how='outer', on=key_id, suffixes=('_3', '_4'))\n",
+        "    #merged_df = pd.merge(df1, df2, how='outer', on=key_id, suffixes=('_1', '_2'))\n",
+        "    #merged_df = pd.merge(merged_df, df3, how='outer', on=key_id)\n",
+        "    #merged_df = pd.merge(merged_df, df4, how='outer', on=key_id, suffixes=('_3', '_4'))\n",
         "\n",
         "    # 4. 합계 계산 및 추가\n",
         "    price_cols = ['price_1', 'price_2', 'price_3', 'price_4']\n",
@@ -159,6 +159,7 @@
         "    df_final = df_final.fillna('')\n",
         "\n",
         "    return df_final\n",
+        "\n",
         "\n",
         "\n",
         "\n",
@@ -223,7 +224,8 @@
         "                )\n",
         "\n",
         "    except Exception as e:\n",
-        "        st.error(f\"오류 발생: {e}\")\n"
+        "        st.error(f\"오류 발생: {e}\")\n",
+        "\n"
       ]
     }
   ]
