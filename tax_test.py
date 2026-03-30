@@ -91,6 +91,12 @@ def process_ecount_file(df: pd.DataFrame, is_free_tax: bool = False) -> pd.DataF
     
     return df_final.fillna('')
 
+#비어있는 데이터프레임을 우측에서 땡겨오는 함수정의
+def shift_left(row):
+    # NaN이 아닌 유효한 값만 추출
+    valid_data = row.dropna().values
+
+
 # --- 2. Streamlit UI 부분 ---
 st.set_page_config(page_title="홈택스 통합 변환기", layout="wide")
 st.title("📄 이카운트 엑셀 → 홈택스 통합 변환기")
