@@ -1,20 +1,3 @@
-import sqlite3
-
-def save_to_sqlite(df: pd.DataFrame, table_name: str):
-    if df.empty:
-        return
-    
-    # 1. DB 연결 (파일 이름: ecount_data.db)
-    conn = sqlite3.connect("ecount_data.db")
-    
-    # 2. 저장 시간 기록 (언제 저장했는지 추적용)
-    df_to_save = df.copy()
-    df_to_save['created_at'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    
-    # 3. SQL 테이블로 저장 (기존 데이터 유지하고 아래에 계속 추가: append)
-    df_to_save.to_sql(table_name, conn, if_exists='append', index=False)
-    
-    conn.close()
 
 import streamlit as st
 import pandas as pd
@@ -169,23 +152,3 @@ if uploaded_file:
     except Exception as e:
         st.error(f"❌ 변환 중 오류 발생: {e}")
 
-if uploaded_file:
-    try:
-        # ... (기존 변환 로직) ...
-        tax_df = process_ecount_file(df_original.copy(), is_free_tax=False)
-        free_df = process_ecount_file(df_original.copy(), is_free_tax=True)
-
-        # --- SQL 저장 실행 ---
-        if not tax_df.empty:
-            save_to_sqlite(tax_df, "tax_history") # 과세 기록 저장
-            st.success("✅ 과세 데이터가 DB에 기록되었습니다.")
-
-        if not free_df.empty:
-            save_to_sqlite(free_df, "free_tax_history") # 면세 기록 저장
-            st.success("✅ 면세 데이터가 DB에 기록되었습니다.")
-
-if st.checkbox("💾 저장된 전체 DB 내역 보기"):
-    conn = sqlite3.connect("ecount_data.db")
-    db_df = pd.read_sql("SELECT * FROM tax_history ORDER BY created_at DESC", conn)
-    st.dataframe(db_df)
-    conn.close()
