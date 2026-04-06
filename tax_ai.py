@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import io
@@ -89,6 +90,28 @@ def process_ecount_file(df: pd.DataFrame, is_free_tax: bool = False) -> pd.DataF
     df_final['TaxNo_get'] = df_final['TaxNo_get'].str.replace('_B', '', regex=False)
     
     return df_final.fillna('')
+
+#비어있는 데이터프레임을 우측에서 땡겨오는 함수정의
+def shift_left(df_final):
+    #행잡기
+    for r in range(df_final.shape[0]):
+      #마지막 열제외 열잡기
+        for c in range(df_final.shape[1] - 1):
+          #0이면 그 뒤에 데이터로 덮고 해당 데이터는 0으로
+            if df_final.iloc[r, c] == 0:
+                df_final.iloc[r, c] = df_final.iloc[r, c+1]
+                df_final.iloc[r, c+1] = 0
+#while 문으로 반복하고 break로 탈출
+#언제 탈출? 마지막으로 행한 df가 이전 df와 동일할때 탈출
+    return df_final
+
+    while True:
+        df_prev = df_final.copy()
+        shift_left(df_final)
+        if df_prev.equals(df_final):
+            break
+
+
 
 # --- 2. Streamlit UI 부분 ---
 st.set_page_config(page_title="홈택스 통합 변환기", layout="wide")
