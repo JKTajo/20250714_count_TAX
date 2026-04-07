@@ -110,7 +110,7 @@ def shift_left(df_final):
         shift_left(df_final)
         if df_prev.equals(df_final):
             break
-
+shift_left(df_final)
 
 
 # --- 2. Streamlit UI 부분 ---
